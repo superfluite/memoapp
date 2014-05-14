@@ -1,5 +1,7 @@
 package com.example.memoapp.app;
 
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -8,10 +10,22 @@ import android.view.MenuItem;
 
 public class MainActivity extends ActionBarActivity {
 
+    private enum Fragmentindex {
+        ADD(0);
+        private int value;
+        private Fragmentindex(int value){
+            this.value=value;
+        }
+    }
+    Fragmentindex currentFragmentIndex;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        currentFragmentIndex=Fragmentindex.ADD;
+        changeFrag(currentFragmentIndex);
     }
 
 
@@ -35,4 +49,23 @@ public class MainActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    public void changeFrag(Fragmentindex index){
+        Fragment frag = null;
+        frag = getFrag(index);
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.frag_container,frag);
+        transaction.addToBackStack(null);
+        transaction.commit();
+    }
+
+    public Fragment getFrag(Fragmentindex index){
+        Fragment frag = null;
+        switch (index) {
+            case ADD:
+                frag=new AddMemoFragment();
+            default:
+                break;
+        }
+        return frag;
+    }
 }

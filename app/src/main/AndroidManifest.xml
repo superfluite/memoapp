@@ -16,6 +16,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name="com.example.memoapp.app.AddMemoFragment"
+            android:label="@string/title_activity_add_memo_fragment" >
+        </activity>
     </application>
 
 </manifest>
