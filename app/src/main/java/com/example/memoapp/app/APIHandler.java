@@ -1,5 +1,12 @@
 package com.example.memoapp.app;
 
+import android.provider.SyncStateContract;
+
+import com.google.gson.Gson;
+import com.google.gson.annotations.SerializedName;
+
+import java.util.List;
+
 import retrofit.RestAdapter;
 
 /**
@@ -30,8 +37,34 @@ public class APIHandler {
     }
 
     public static class MemoData{
+        @SerializedName("id")
+        private int id;
+        @SerializedName("text")
+        private String text;
+        @SerializedName("writetime")
+        private String writetime;
+        @SerializedName("writerid")
+        private String writerid;
+
+        public final int getId(){
+            return this.id;
+        }
+
+        public String getText() {
+            return this.text;
+        }
+
+        public String getWritetime() {
+            return this.writetime;
+        }
+
+        public String getWriterid() {
+            return this.writerid;
+        }
+        /*
         int id;
         String text;
         String writetime;
+        */
     }
 }

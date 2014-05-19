@@ -1,5 +1,7 @@
 package com.example.memoapp.app;
 
+import java.util.List;
+
 import retrofit.Callback;
 import retrofit.http.GET;
 import retrofit.http.Query;
@@ -9,5 +11,5 @@ import retrofit.http.Query;
  */
 public interface MemoAPI {
     @GET("/api")
-    void getMemo(@Query("number") String number, Callback<APIHandler.MemoData> callback);
+    void getMemo(@Query("number") String number, Callback<List<APIHandler.MemoData>> callback);
 }

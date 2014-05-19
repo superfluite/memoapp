@@ -1,6 +1,5 @@
 package com.example.memoapp.app;
 
-import android.app.ActionBar;
 import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -11,15 +10,14 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.Button;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import retrofit.Callback;
 import retrofit.RetrofitError;
@@ -30,35 +28,50 @@ public class MainActivity extends ActionBarActivity {
     private ListView memoList;
     private ListViewAdapter listViewAdapter;
 
-    private enum Fragmentindex {
+    public enum Fragmentindex {
         ADD(0);
         private int value;
         private Fragmentindex(int value){
             this.value=value;
         }
     }
-    private Fragmentindex currentFragmentIndex;
+    //public Fragmentindex currentFragmentIndex;
+    public static class FragController{
+        private Fragmentindex currentFragmentIndex;
+        public Fragmentindex getCurrentFragmentIndex(){
+            return this.currentFragmentIndex;
+        }
+        public void setCurrentFragmentIndex(Fragmentindex index){
+            this.currentFragmentIndex=index;
+        }
+    }
+
+    public FragController fragController;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //currentFragmentIndex = Fragmentindex.ADD;
-        //changeFrag(currentFragmentIndex);
-
-        Button button = (Button)findViewById(R.id.button);
+        Button button = (Button)findViewById(R.id.new_memo);
         button.setOnClickListener(new buttonClickListener());
 
         memoList = (ListView)findViewById(R.id.memo_list);
         listViewAdapter = new ListViewAdapter(this);
         memoList.setAdapter(listViewAdapter);
+
+        fragController = new FragController();
+
+        callMemoAPI();
     }
 
     private class buttonClickListener implements View.OnClickListener {
         @Override
         public void onClick(View view) {
-            callMemoAPI();
+            fragController.setCurrentFragmentIndex(Fragmentindex.ADD);
+            changeFrag(fragController.getCurrentFragmentIndex());
+            View main=findViewById(R.id.memos);
+            main.setVisibility(View.GONE);
         }
     }
 
@@ -82,42 +95,27 @@ public class MainActivity extends ActionBarActivity {
     }
 
     public void callMemoAPI(){
-        MemoAPI memoAPI = APIHandler.getApiInterface();
-        memoAPI.getMemo(null,new Callback<APIHandler.MemoData>() {
+        final MemoAPI memoAPI = APIHandler.getApiInterface();
+        memoAPI.getMemo(null, new Callback<List<APIHandler.MemoData>>() {
 
             @Override
-            public void success(APIHandler.MemoData memoData, Response response) {
-                Toast.makeText(getApplicationContext(),"SUCCEED!",Toast.LENGTH_LONG).show();
-                listViewAdapter.addData(memoData.text,memoData.writetime);
+            public void success(List<APIHandler.MemoData> memoData, Response response) {
+                Toast.makeText(getApplicationContext(), "SUCCEED!", Toast.LENGTH_LONG).show();
+                for(int i=0;i<memoData.size();i++){
+                    APIHandler.MemoData data=memoData.get(i);
+                    listViewAdapter.addData(data.getText(),data.getWritetime());
+                }
+                //listViewAdapter.addData(memoData.getText(), memoData.getWriteTime());
                 listViewAdapter.notifyDataSetChanged();
+
             }
 
             @Override
             public void failure(RetrofitError retrofitError) {
                 retrofitError.printStackTrace();
-                Toast.makeText(getApplicationContext(),"Falied",Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "Failed", Toast.LENGTH_LONG).show();
             }
         });
-    }
-
-    public void changeFrag(Fragmentindex index){
-        Fragment frag = null;
-        frag = getFrag(index);
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.frag_container,frag);
-        transaction.addToBackStack(null);
-        transaction.commit();
-    }
-
-    public Fragment getFrag(Fragmentindex index){
-        Fragment frag = null;
-        switch (index) {
-            case ADD:
-                frag=new AddMemoFragment();
-            default:
-                break;
-        }
-        return frag;
     }
 
     private class ViewHolder {
@@ -180,10 +178,34 @@ public class MainActivity extends ActionBarActivity {
 
             listData.add(data);
         }
-
+        /*
+        public void addData(List<APIHandler.MemoData> data){
+            data.
+        }
+        */
         public void deleteData(int position){
             listData.remove(position);
             listViewAdapter.notifyDataSetChanged();
         }
+    }
+
+    public void changeFrag(Fragmentindex index){
+        Fragment frag = null;
+        frag = getFrag(index);
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.frag_container,frag);
+        transaction.addToBackStack(null);
+        transaction.commit();
+    }
+
+    public Fragment getFrag(Fragmentindex index){
+        Fragment frag = null;
+        switch (index) {
+            case ADD:
+                frag=new AddMemoFragment();
+            default:
+                break;
+        }
+        return frag;
     }
 }
