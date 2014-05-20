@@ -25,7 +25,8 @@
         <ListView
             android:layout_width="match_parent"
             android:layout_height="441dp"
-            android:id="@+id/memo_list" />
+            android:id="@+id/memo_list"
+            android:longClickable="true"/>
 
         <Button
             style="?android:attr/buttonStyleSmall"

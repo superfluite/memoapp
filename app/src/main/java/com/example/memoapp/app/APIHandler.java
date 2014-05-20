@@ -13,7 +13,7 @@ import retrofit.RestAdapter;
  * Created by Limesty on 2014-05-15.
  */
 public class APIHandler {
-    private static final String API_URL="http://memopage.herokuapp.com/";
+    private static final String API_URL="http://192.168.0.96:5000";
     private static RestAdapter restAdapter;
 
     private static RestAdapter getRestAdapter(){
@@ -44,7 +44,7 @@ public class APIHandler {
         @SerializedName("writetime")
         private String writetime;
         @SerializedName("writerid")
-        private String writerid;
+        private int writerid;
 
         public final int getId(){
             return this.id;
@@ -58,13 +58,23 @@ public class APIHandler {
             return this.writetime;
         }
 
-        public String getWriterid() {
+        public int getWriterid() {
             return this.writerid;
         }
-        /*
-        int id;
-        String text;
-        String writetime;
-        */
+    }
+
+    public static class AddData {
+        @SerializedName("text")
+        private String text;
+        @SerializedName("writerid")
+        private int writerid;
+
+        public String getText() {
+            return this.text;
+        }
+
+        public int getWriterid() {
+            return this.writerid;
+        }
     }
 }

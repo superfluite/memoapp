@@ -6,5 +6,7 @@
     <string name="action_settings">Settings</string>
     <string name="title_activity_add_memo_fragment">AddMemoFragment</string>
     <string name="title_activity_add_memo">AddMemoActivity</string>
+    <string name="title_activity_show_memo">ShowMemoActivity</string>
+    <string name="title_activity_edit_memo">EditMemoActivity</string>
 
 </resources>

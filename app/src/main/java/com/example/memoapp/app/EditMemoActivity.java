@@ -15,32 +15,46 @@ import retrofit.RetrofitError;
 import retrofit.client.Response;
 
 
-public class AddMemoActivity extends ActionBarActivity {
+public class EditMemoActivity extends ActionBarActivity {
     private EditText memoText;
-    private Button saveButton;
+    private Button editButton;
     private Button resetButton;
     private Button cancelButton;
+    private int memoId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add_memo);
+        setContentView(R.layout.activity_edit_memo);
+        memoText = (EditText)findViewById(R.id.memo_text_edit);
 
-        memoText = (EditText)findViewById(R.id.memo_text);
-
-        saveButton = (Button)findViewById(R.id.save_button);
-        saveButton.setOnClickListener(new Save());
-        resetButton = (Button)findViewById(R.id.reset_button);
+        editButton = (Button)findViewById(R.id.edit_button);
+        editButton.setOnClickListener(new Edit());
+        resetButton = (Button)findViewById(R.id.reset_button_in_edit);
         resetButton.setOnClickListener(new Reset());
-        cancelButton = (Button)findViewById(R.id.cancel_button);
+        cancelButton = (Button)findViewById(R.id.cancel_button_in_edit);
         cancelButton.setOnClickListener(new Cancel());
+
+        Intent intent = getIntent();
+        memoId = (Integer)intent.getExtras().get("id");
+        memoText.setText(intent.getExtras().get("text").toString());
     }
 
-    private class Save implements View.OnClickListener{
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.edit_memo, menu);
+        return true;
+    }
+
+
+    private class Edit implements View.OnClickListener{
         @Override
         public void onClick(View view) {
             callMemoAPI();
-            onBackPressed();
+            Intent mainActivity = new Intent(EditMemoActivity.this, MainActivity.class);
+            startActivity(mainActivity);
         }
     }
 
@@ -59,13 +73,6 @@ public class AddMemoActivity extends ActionBarActivity {
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.add_memo, menu);
-        return true;
-    }
-
-    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
@@ -79,10 +86,10 @@ public class AddMemoActivity extends ActionBarActivity {
 
     public void callMemoAPI(){
         final MemoAPI memoAPI = APIHandler.getApiInterface();
-        memoAPI.updateMemo(memoText.getText().toString(), 1, new Callback<APIHandler.AddData>(){
+        memoAPI.editMemo(memoId, memoText.getText().toString(), 1, new Callback<APIHandler.AddData>() {
             @Override
             public void success(APIHandler.AddData addData, Response response) {
-                Toast.makeText(getApplicationContext(), "Memo Added!", Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "Memo Edited!", Toast.LENGTH_LONG).show();
             }
 
             @Override
