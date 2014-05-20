@@ -111,7 +111,7 @@ public class MainActivity extends ActionBarActivity {
             @Override
             public void failure(RetrofitError retrofitError) {
                 retrofitError.printStackTrace();
-                Toast.makeText(getApplicationContext(), "Failed", Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "불러오기 실패", Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -121,7 +121,7 @@ public class MainActivity extends ActionBarActivity {
         memoAPI.deleteMemo(id, new Callback<APIHandler.AddData>() {
             @Override
             public void success(APIHandler.AddData addData, Response response) {
-                Toast.makeText(getApplicationContext(), "Memo Deleted", Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "삭제되었습니다", Toast.LENGTH_LONG).show();
             }
 
             @Override
@@ -153,7 +153,7 @@ public class MainActivity extends ActionBarActivity {
 
     private void MemoDialog(int pos){
         final ListData memoData = listViewAdapter.getItem(pos);
-        final String items[] = {"내용 보기", "편집", "삭제", "취소"};
+        final String items[] = {"내용 보기", "수정", "삭제", "취소"};
         final int SHOW=0;
         final int EDIT=1;
         final int DELETE=2;

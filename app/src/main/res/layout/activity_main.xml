@@ -32,7 +32,7 @@
             style="?android:attr/buttonStyleSmall"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="New Memo"
+            android:text="새 메모"
             android:id="@+id/new_memo"
             android:layout_gravity="center_horizontal"
             android:layout_alignParentBottom="true"

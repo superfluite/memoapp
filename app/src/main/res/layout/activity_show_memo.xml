@@ -35,28 +35,31 @@
         >
 
         <Button
+            style="?android:attr/buttonStyleSmall"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Edit"
+            android:text="수정"
             android:id="@+id/edit_button"
             android:layout_gravity="bottom"
             android:layout_alignParentBottom="true" />
 
         <Button
+            style="?android:attr/buttonStyleSmall"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Delete"
+            android:text="삭제"
             android:id="@+id/delete_button"
             android:layout_gravity="bottom"
             android:layout_alignParentBottom="true" />
 
         <Button
+            style="?android:attr/buttonStyleSmall"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Cancel"
+            android:text="취소"
             android:id="@+id/cancel_button_in_show"
             android:layout_gravity="bottom"
             android:layout_alignParentBottom="true" />

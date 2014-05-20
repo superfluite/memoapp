@@ -89,7 +89,7 @@ public class EditMemoActivity extends ActionBarActivity {
         memoAPI.editMemo(memoId, memoText.getText().toString(), 1, new Callback<APIHandler.AddData>() {
             @Override
             public void success(APIHandler.AddData addData, Response response) {
-                Toast.makeText(getApplicationContext(), "Memo Edited!", Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "수정되었습니다", Toast.LENGTH_LONG).show();
             }
 
             @Override

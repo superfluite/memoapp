@@ -120,7 +120,7 @@ public class ShowMemoActivity extends ActionBarActivity {
         memoAPI.deleteMemo(id, new Callback<APIHandler.AddData>() {
             @Override
             public void success(APIHandler.AddData addData, Response response) {
-                Toast.makeText(getApplicationContext(), "Memo Deleted", Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "삭제되었습니다", Toast.LENGTH_LONG).show();
             }
 
             @Override
