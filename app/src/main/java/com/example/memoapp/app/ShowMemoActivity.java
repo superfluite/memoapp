@@ -58,6 +58,7 @@ public class ShowMemoActivity extends ActionBarActivity {
             editActivity.putExtra("id", memoId);
             editActivity.putExtra("text", memoText);
             editActivity.putExtra("date", memoDate);
+            finish();
             startActivity(editActivity);
         }
     }
