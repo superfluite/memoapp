@@ -78,4 +78,25 @@ public class APIHandler {
             return this.writerid;
         }
     }
+
+    public static class User {
+        @SerializedName("id")
+        private int id;
+        @SerializedName("userId")
+        private String userId;
+        @SerializedName("userPassword")
+        private String userPassword;
+
+        public int getId() {
+            return this.id;
+        }
+
+        public String getUserId() {
+            return this.userId;
+        }
+
+        public String getUserPassword() {
+            return this.userPassword;
+        }
+    }
 }

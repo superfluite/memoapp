@@ -21,6 +21,8 @@ public class EditMemoActivity extends ActionBarActivity {
     private Button resetButton;
     private Button cancelButton;
     private int memoId;
+    private boolean togoMain;
+    private String memoDate;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +40,8 @@ public class EditMemoActivity extends ActionBarActivity {
         Intent intent = getIntent();
         memoId = (Integer)intent.getExtras().get("id");
         memoText.setText(intent.getExtras().get("text").toString());
+        memoDate = intent.getExtras().get("date").toString();
+        togoMain = (Boolean)intent.getExtras().get("togoMain");
     }
 
     @Override
@@ -48,13 +52,19 @@ public class EditMemoActivity extends ActionBarActivity {
         return true;
     }
 
-
     private class Edit implements View.OnClickListener{
         @Override
         public void onClick(View view) {
-            callMemoAPI();
-            Intent mainActivity = new Intent(EditMemoActivity.this, MainActivity.class);
-            startActivity(mainActivity);
+            callMemoEditAPI();
+            if (togoMain) {
+                onBackPressed();
+            } else {
+                Intent showActivity = new Intent(EditMemoActivity.this , ShowMemoActivity.class);
+                showActivity.putExtra("id", memoId);
+                showActivity.putExtra("text", memoText.getText().toString());
+                showActivity.putExtra("date", memoDate);
+                startActivity(showActivity);
+            }
         }
     }
 
@@ -84,7 +94,7 @@ public class EditMemoActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void callMemoAPI(){
+    public void callMemoEditAPI(){
         final MemoAPI memoAPI = APIHandler.getApiInterface();
         memoAPI.editMemo(memoId, memoText.getText().toString(), 1, new Callback<APIHandler.AddData>() {
             @Override

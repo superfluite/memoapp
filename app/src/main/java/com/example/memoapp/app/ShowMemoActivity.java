@@ -54,6 +54,7 @@ public class ShowMemoActivity extends ActionBarActivity {
         @Override
         public void onClick(View view) {
             Intent editActivity = new Intent(ShowMemoActivity.this,EditMemoActivity.class);
+            editActivity.putExtra("togoMain", false);
             editActivity.putExtra("id", memoId);
             editActivity.putExtra("text", memoText);
             editActivity.putExtra("date", memoDate);

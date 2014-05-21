@@ -20,6 +20,7 @@ public class AddMemoActivity extends ActionBarActivity {
     private Button saveButton;
     private Button resetButton;
     private Button cancelButton;
+    private int currentUserId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +35,9 @@ public class AddMemoActivity extends ActionBarActivity {
         resetButton.setOnClickListener(new Reset());
         cancelButton = (Button)findViewById(R.id.cancel_button);
         cancelButton.setOnClickListener(new Cancel());
+
+        Intent intent = getIntent();
+        currentUserId = (Integer)intent.getExtras().get("currentUserId");
     }
 
     private class Save implements View.OnClickListener{
@@ -79,7 +83,7 @@ public class AddMemoActivity extends ActionBarActivity {
 
     public void callMemoAPI(){
         final MemoAPI memoAPI = APIHandler.getApiInterface();
-        memoAPI.updateMemo(memoText.getText().toString(), 1, new Callback<APIHandler.AddData>(){
+        memoAPI.updateMemo(memoText.getText().toString(), currentUserId, new Callback<APIHandler.AddData>(){
             @Override
             public void success(APIHandler.AddData addData, Response response) {
                 Toast.makeText(getApplicationContext(), "메모가 저장되었습니다", Toast.LENGTH_LONG).show();

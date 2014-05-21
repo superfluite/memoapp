@@ -59,7 +59,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="취소"
+            android:text="이전으로"
             android:id="@+id/cancel_button_in_show"
             android:layout_gravity="bottom"
             android:layout_alignParentBottom="true" />

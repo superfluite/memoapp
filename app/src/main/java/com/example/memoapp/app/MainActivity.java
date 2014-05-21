@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -31,6 +32,12 @@ public class MainActivity extends ActionBarActivity {
 
     private ListView memoList;
     private ListViewAdapter listViewAdapter;
+    private UserData currentUser = new UserData();
+    private Button newMemoButton;
+    private Button loginButton;
+    private Button signUpButton;
+    private EditText idText;
+    private EditText passwordText;
 
     public enum Fragmentindex {;
         private int value;
@@ -44,8 +51,14 @@ public class MainActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Button button = (Button)findViewById(R.id.new_memo);
-        button.setOnClickListener(new buttonClickListener());
+        newMemoButton = (Button)findViewById(R.id.new_memo);
+        newMemoButton.setOnClickListener(new NewMemo());
+        loginButton = (Button)findViewById(R.id.login_button);
+        loginButton.setOnClickListener(new Login());
+        signUpButton = (Button)findViewById(R.id.to_sign_up_button);
+        signUpButton.setOnClickListener(new SignUp());
+        idText = (EditText)findViewById(R.id.id_text);
+        passwordText = (EditText)findViewById(R.id.password_text);
 
         memoList = (ListView)findViewById(R.id.memo_list);
         listViewAdapter = new ListViewAdapter(this);
@@ -54,11 +67,27 @@ public class MainActivity extends ActionBarActivity {
         memoList.setOnItemClickListener(new MemoClick());
     }
 
-    private class buttonClickListener implements View.OnClickListener {
+    private class NewMemo implements View.OnClickListener {
         @Override
         public void onClick(View view) {
             Intent addActivity = new Intent(MainActivity.this, AddMemoActivity.class);
+            addActivity.putExtra("currentUserId", currentUser.id);
             startActivity(addActivity);
+        }
+    }
+
+    private class Login implements View.OnClickListener {
+        @Override
+        public void onClick(View view) {
+            callLoginAPI();
+        }
+    }
+
+    private class SignUp implements View.OnClickListener {
+        @Override
+        public void onClick(View view) {
+            Intent signUpActivity = new Intent(MainActivity.this,SignUpActivity.class);
+            startActivity(signUpActivity);
         }
     }
 
@@ -71,13 +100,20 @@ public class MainActivity extends ActionBarActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        callMemoAPI();
+        if (currentUser.userId == null) {
+            changeViewGone(R.id.memos);
+            changeViewVisible(R.id.login);
+        } else {
+            changeViewGone(R.id.login);
+            changeViewVisible(R.id.memos);
+            callMemoAPI();
+        }
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
+            getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
 
@@ -87,24 +123,29 @@ public class MainActivity extends ActionBarActivity {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
+        switch (id) {
+            case R.id.logout :
+                LogoutDialog();
+                break;
+            case R.id.delete_account :
+
+                break;
+            default :
+                break;
         }
         return super.onOptionsItemSelected(item);
     }
 
     public void callMemoAPI(){
         final MemoAPI memoAPI = APIHandler.getApiInterface();
-        memoAPI.getMemo(null, new Callback<List<APIHandler.MemoData>>() {
+        memoAPI.getMemo(currentUser.id, new Callback<List<APIHandler.MemoData>>() {
 
             @Override
             public void success(List<APIHandler.MemoData> memoData, Response response) {
-                //Toast.makeText(getApplicationContext(), "SUCCEED!", Toast.LENGTH_LONG).show();
                 for(int i=0;i<memoData.size();i++){
                     APIHandler.MemoData data=memoData.get(i);
                     listViewAdapter.addData(data.getId(), data.getText(), data.getWritetime());
                 }
-                //listViewAdapter.addData(memoData.getText(), memoData.getWriteTime());
                 listViewAdapter.notifyDataSetChanged();
             }
 
@@ -126,6 +167,28 @@ public class MainActivity extends ActionBarActivity {
 
             @Override
             public void failure(RetrofitError retrofitError) {
+                retrofitError.printStackTrace();
+            }
+        });
+    }
+
+    public void callLoginAPI(){
+        final MemoAPI memoAPI = APIHandler.getApiInterface();
+        memoAPI.login(idText.getText().toString(),passwordText.getText().toString(),new Callback<APIHandler.User>() {
+            @Override
+            public void success(APIHandler.User user, Response response) {
+                Toast.makeText(getApplicationContext(), "로그인 성공", Toast.LENGTH_LONG).show();
+                changeViewVisibility(R.id.login);
+                changeViewVisibility(R.id.memos);
+                currentUser.id = user.getId();
+                currentUser.userId = user.getUserId();
+                currentUser.userPassword = user.getUserPassword();
+                callMemoAPI();
+            }
+
+            @Override
+            public void failure(RetrofitError retrofitError) {
+                Toast.makeText(getApplicationContext(), "로그인 실패", Toast.LENGTH_LONG).show();
                 retrofitError.printStackTrace();
             }
         });
@@ -153,6 +216,7 @@ public class MainActivity extends ActionBarActivity {
 
     private void MemoDialog(int pos){
         final ListData memoData = listViewAdapter.getItem(pos);
+        final int position = pos;
         final String items[] = {"내용 보기", "수정", "삭제", "취소"};
         final int SHOW=0;
         final int EDIT=1;
@@ -162,7 +226,6 @@ public class MainActivity extends ActionBarActivity {
         dialog.setItems(items,new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-
                 switch(i){
                     case SHOW:
                         Intent showActivity = new Intent(MainActivity.this, ShowMemoActivity.class);
@@ -173,13 +236,16 @@ public class MainActivity extends ActionBarActivity {
                         break;
                     case EDIT:
                         Intent editActivity = new Intent(MainActivity.this, EditMemoActivity.class);
+                        editActivity.putExtra("togoMain", true);
                         editActivity.putExtra("id", memoData.memoId);
                         editActivity.putExtra("text", memoData.memoText);
                         editActivity.putExtra("date", memoData.memoDate);
                         startActivity(editActivity);
                         break;
                     case DELETE:
-                        DeleteDialog(memoData.memoId);
+                        DeleteDialog(memoData.memoId, position);
+                        //listViewAdapter.deleteData(position);
+                        //listViewAdapter.notifyDataSetChanged();
                         break;
                     case CANCEL:
                         break;
@@ -190,25 +256,44 @@ public class MainActivity extends ActionBarActivity {
         dialog.show();
     }
 
-    private void DeleteDialog(int id){
+    private void DeleteDialog(int id, int position){
         AlertDialog.Builder checkDialog = new AlertDialog.Builder(MainActivity.this);
         checkDialog.setMessage("삭제하시겠습니까?");
         checkDialog.setNegativeButton("취소", null);
-        checkDialog.setPositiveButton("삭제",new Delete(id));
+        checkDialog.setPositiveButton("삭제", new Delete(id, position));
         checkDialog.show();
     }
 
     private class Delete implements DialogInterface.OnClickListener{
         int id;
-        Delete(int id){
+        int position;
+        Delete(int id, int position){
             this.id = id;
+            this.position = position;
         }
         @Override
         public void onClick(DialogInterface dialogInterface, int i) {
             callMemoDeleteAPI(id);
-            Intent intent = getIntent();
+            listViewAdapter.deleteData(position);
+            listViewAdapter.notifyDataSetChanged();
+        }
+    }
+
+    private void LogoutDialog(){
+        AlertDialog.Builder checkDialog = new AlertDialog.Builder(MainActivity.this);
+        checkDialog.setMessage("로그아웃하시겠습니까?");
+        checkDialog.setNegativeButton("취소", null);
+        checkDialog.setPositiveButton("로그아웃", new Logout());
+        checkDialog.show();
+    }
+
+    private class Logout implements DialogInterface.OnClickListener{
+        @Override
+        public void onClick(DialogInterface dialogInterface, int i) {
+            currentUser = new UserData();
+            Intent refresh = getIntent();
             finish();
-            startActivity(intent);
+            startActivity(refresh);
         }
     }
 
@@ -305,5 +390,24 @@ public class MainActivity extends ActionBarActivity {
         public void setCurrentFragmentIndex(Fragmentindex index){
             this.currentFragmentIndex=index;
         }
+    }
+
+    private void changeViewVisibility(int id){
+        View Target = (View)findViewById(id);
+        if (Target.getVisibility()==View.VISIBLE) {
+            Target.setVisibility(View.GONE);
+        } else {
+            Target.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void changeViewVisible(int id){
+        View Target = (View)findViewById(id);
+        Target.setVisibility(View.VISIBLE);
+    }
+
+    private void changeViewGone(int id){
+        View Target = (View)findViewById(id);
+        Target.setVisibility(View.GONE);
     }
 }
