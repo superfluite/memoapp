@@ -26,7 +26,7 @@ public interface MemoAPI {
 
     @Multipart
     @POST("/api/edit")
-    void editMemo(@Part ("id") int id, @Part("text") String text, @Part("writerid") int writerid, Callback<APIHandler.AddData> callback);
+    void editMemo(@Part("id") int id, @Part("text") String text, @Part("writerid") int writerid, Callback<APIHandler.AddData> callback);
 
     @Multipart
     @POST("/api/delete")
@@ -39,4 +39,8 @@ public interface MemoAPI {
     @FormUrlEncoded
     @POST("/api/signup")
     void signup(@Field("userId") String userId, @Field("userPassword") String userPassword, Callback<APIHandler.User> callback);
+
+    @FormUrlEncoded
+    @POST("/api/deleteaccount")
+    void deleteAccount(@Field("id") int id, Callback<APIHandler.User> callback);
 }

@@ -128,70 +128,12 @@ public class MainActivity extends ActionBarActivity {
                 LogoutDialog();
                 break;
             case R.id.delete_account :
-
+                DeleteAccountDialog();
                 break;
             default :
                 break;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    public void callMemoAPI(){
-        final MemoAPI memoAPI = APIHandler.getApiInterface();
-        memoAPI.getMemo(currentUser.id, new Callback<List<APIHandler.MemoData>>() {
-
-            @Override
-            public void success(List<APIHandler.MemoData> memoData, Response response) {
-                for(int i=0;i<memoData.size();i++){
-                    APIHandler.MemoData data=memoData.get(i);
-                    listViewAdapter.addData(data.getId(), data.getText(), data.getWritetime());
-                }
-                listViewAdapter.notifyDataSetChanged();
-            }
-
-            @Override
-            public void failure(RetrofitError retrofitError) {
-                retrofitError.printStackTrace();
-                Toast.makeText(getApplicationContext(), "불러오기 실패", Toast.LENGTH_LONG).show();
-            }
-        });
-    }
-
-    public void callMemoDeleteAPI(int id){
-        final MemoAPI memoAPI = APIHandler.getApiInterface();
-        memoAPI.deleteMemo(id, new Callback<APIHandler.AddData>() {
-            @Override
-            public void success(APIHandler.AddData addData, Response response) {
-                Toast.makeText(getApplicationContext(), "삭제되었습니다", Toast.LENGTH_LONG).show();
-            }
-
-            @Override
-            public void failure(RetrofitError retrofitError) {
-                retrofitError.printStackTrace();
-            }
-        });
-    }
-
-    public void callLoginAPI(){
-        final MemoAPI memoAPI = APIHandler.getApiInterface();
-        memoAPI.login(idText.getText().toString(),passwordText.getText().toString(),new Callback<APIHandler.User>() {
-            @Override
-            public void success(APIHandler.User user, Response response) {
-                Toast.makeText(getApplicationContext(), "로그인 성공", Toast.LENGTH_LONG).show();
-                changeViewVisibility(R.id.login);
-                changeViewVisibility(R.id.memos);
-                currentUser.id = user.getId();
-                currentUser.userId = user.getUserId();
-                currentUser.userPassword = user.getUserPassword();
-                callMemoAPI();
-            }
-
-            @Override
-            public void failure(RetrofitError retrofitError) {
-                Toast.makeText(getApplicationContext(), "로그인 실패", Toast.LENGTH_LONG).show();
-                retrofitError.printStackTrace();
-            }
-        });
     }
 
     private class MemoLongClick implements AdapterView.OnItemLongClickListener{
@@ -297,6 +239,21 @@ public class MainActivity extends ActionBarActivity {
         }
     }
 
+    private void DeleteAccountDialog(){
+        AlertDialog.Builder checkoutDialog = new AlertDialog.Builder(MainActivity.this);
+        checkoutDialog.setMessage("탈퇴하시겠습니까?\n탈퇴시 작성했던 모든 메모가 삭제됩니다");
+        checkoutDialog.setNegativeButton("취소", null);
+        checkoutDialog.setPositiveButton("탈퇴", new DeleteAccount());
+        checkoutDialog.show();
+    }
+
+    private class DeleteAccount implements DialogInterface.OnClickListener{
+        @Override
+        public void onClick(DialogInterface dialogInterface, int i) {
+            callDeleteAccountAPI();
+        }
+    }
+
     public static class ViewHolder {
         public TextView memotext;
         public TextView memodate;
@@ -362,6 +319,83 @@ public class MainActivity extends ActionBarActivity {
         public void deleteData(int position){
             listData.remove(position);
         }
+    }
+
+    public void callMemoAPI(){
+        final MemoAPI memoAPI = APIHandler.getApiInterface();
+        memoAPI.getMemo(currentUser.id, new Callback<List<APIHandler.MemoData>>() {
+
+            @Override
+            public void success(List<APIHandler.MemoData> memoData, Response response) {
+                for(int i=0;i<memoData.size();i++){
+                    APIHandler.MemoData data=memoData.get(i);
+                    listViewAdapter.addData(data.getId(), data.getText(), data.getWritetime());
+                }
+                listViewAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void failure(RetrofitError retrofitError) {
+                retrofitError.printStackTrace();
+                Toast.makeText(getApplicationContext(), "불러오기 실패", Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    public void callMemoDeleteAPI(int id){
+        final MemoAPI memoAPI = APIHandler.getApiInterface();
+        memoAPI.deleteMemo(id, new Callback<APIHandler.AddData>() {
+            @Override
+            public void success(APIHandler.AddData addData, Response response) {
+                Toast.makeText(getApplicationContext(), "삭제되었습니다", Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void failure(RetrofitError retrofitError) {
+                retrofitError.printStackTrace();
+            }
+        });
+    }
+
+    public void callLoginAPI(){
+        final MemoAPI memoAPI = APIHandler.getApiInterface();
+        memoAPI.login(idText.getText().toString(),passwordText.getText().toString(),new Callback<APIHandler.User>() {
+            @Override
+            public void success(APIHandler.User user, Response response) {
+                Toast.makeText(getApplicationContext(), "로그인 성공", Toast.LENGTH_LONG).show();
+                changeViewVisibility(R.id.login);
+                changeViewVisibility(R.id.memos);
+                currentUser.id = user.getId();
+                currentUser.userId = user.getUserId();
+                currentUser.userPassword = user.getUserPassword();
+                callMemoAPI();
+            }
+
+            @Override
+            public void failure(RetrofitError retrofitError) {
+                Toast.makeText(getApplicationContext(), "로그인 실패", Toast.LENGTH_LONG).show();
+                retrofitError.printStackTrace();
+            }
+        });
+    }
+
+    public void callDeleteAccountAPI(){
+        final MemoAPI memoAPI = APIHandler.getApiInterface();
+        memoAPI.deleteAccount(currentUser.id, new Callback<APIHandler.User>() {
+            @Override
+            public void success(APIHandler.User user, Response response) {
+                Toast.makeText(getApplicationContext(), "탈퇴하였습니다", Toast.LENGTH_LONG).show();
+                Intent refresh = getIntent();
+                finish();
+                startActivity(refresh);
+            }
+
+            @Override
+            public void failure(RetrofitError retrofitError) {
+                retrofitError.printStackTrace();
+                Toast.makeText(getApplicationContext(), "탈퇴 실패", Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
     public void changeFrag(Fragmentindex index){
