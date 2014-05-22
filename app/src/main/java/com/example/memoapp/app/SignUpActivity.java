@@ -13,7 +13,6 @@ import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
 
-
 public class SignUpActivity extends ActionBarActivity {
 
     private EditText idText;

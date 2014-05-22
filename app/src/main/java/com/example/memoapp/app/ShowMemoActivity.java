@@ -43,9 +43,9 @@ public class ShowMemoActivity extends ActionBarActivity {
         cancelButton.setOnClickListener(new Cancel());
 
         Intent intent = getIntent();
-        memoId = (Integer)intent.getExtras().get("id");
-        memoText = intent.getExtras().get("text").toString();
-        memoDate = intent.getExtras().get("date").toString();
+        memoId = intent.getExtras().getInt("id");
+        memoText = intent.getStringExtra("text");
+        memoDate = intent.getStringExtra("date");
         showMemo.setText(memoText);
         showDate.setText(memoDate);
 
