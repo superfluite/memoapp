@@ -65,6 +65,13 @@ public class MainActivity extends ActionBarActivity {
         memoList.setAdapter(listViewAdapter);
         memoList.setOnItemLongClickListener(new MemoLongClick());
         memoList.setOnItemClickListener(new MemoClick());
+
+        Bundle check =  getIntent().getExtras();
+        if (check != null) {
+            currentUser.id = check.getInt("id");
+            currentUser.userId = check.getString("userId");
+            currentUser.userPassword = check.getString("userPassword");
+        }
     }
 
     private class NewMemo implements View.OnClickListener {
@@ -79,7 +86,13 @@ public class MainActivity extends ActionBarActivity {
     private class Login implements View.OnClickListener {
         @Override
         public void onClick(View view) {
-            callLoginAPI();
+            if (idText.getText().toString().matches("")) {
+                Toast.makeText(getApplicationContext(), "아이디를 입력하세요", Toast.LENGTH_LONG).show();
+            } else if(passwordText.getText().toString().matches("")) {
+                Toast.makeText(getApplicationContext(), "비밀번호를 입력하세요", Toast.LENGTH_LONG).show();
+            } else {
+                callLoginAPI();
+            }
         }
     }
 
@@ -113,7 +126,9 @@ public class MainActivity extends ActionBarActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
+        if (currentUser.userId != null) {
             getMenuInflater().inflate(R.menu.main, menu);
+        }
         return true;
     }
 
@@ -160,10 +175,10 @@ public class MainActivity extends ActionBarActivity {
         final ListData memoData = listViewAdapter.getItem(pos);
         final int position = pos;
         final String items[] = {"내용 보기", "수정", "삭제", "취소"};
-        final int SHOW=0;
-        final int EDIT=1;
-        final int DELETE=2;
-        final int CANCEL=3;
+        final int SHOW = 0;
+        final int EDIT = 1;
+        final int DELETE = 2;
+        final int CANCEL = 3;
         AlertDialog.Builder dialog = new AlertDialog.Builder(MainActivity.this);
         dialog.setItems(items,new DialogInterface.OnClickListener() {
             @Override
@@ -233,7 +248,7 @@ public class MainActivity extends ActionBarActivity {
         @Override
         public void onClick(DialogInterface dialogInterface, int i) {
             currentUser = new UserData();
-            Intent refresh = getIntent();
+            Intent refresh = new Intent(MainActivity.this, MainActivity.class);
             finish();
             startActivity(refresh);
         }
@@ -363,12 +378,20 @@ public class MainActivity extends ActionBarActivity {
             @Override
             public void success(APIHandler.User user, Response response) {
                 Toast.makeText(getApplicationContext(), "로그인 성공", Toast.LENGTH_LONG).show();
+                Intent mainActivity = new Intent(MainActivity.this, MainActivity.class);
+                mainActivity.putExtra("id", user.getId());
+                mainActivity.putExtra("userId", user.getUserId());
+                mainActivity.putExtra("userPassword", user.getUserPassword());
+                finish();
+                startActivity(mainActivity);
+                /*
                 changeViewVisibility(R.id.login);
                 changeViewVisibility(R.id.memos);
                 currentUser.id = user.getId();
                 currentUser.userId = user.getUserId();
                 currentUser.userPassword = user.getUserPassword();
                 callMemoAPI();
+                */
             }
 
             @Override

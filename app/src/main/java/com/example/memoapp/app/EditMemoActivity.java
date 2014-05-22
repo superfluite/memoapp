@@ -14,7 +14,6 @@ import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
 
-
 public class EditMemoActivity extends ActionBarActivity {
     private EditText memoText;
     private Button editButton;
@@ -42,6 +41,8 @@ public class EditMemoActivity extends ActionBarActivity {
         memoText.setText(intent.getExtras().get("text").toString());
         memoDate = intent.getExtras().get("date").toString();
         togoMain = (Boolean)intent.getExtras().get("togoMain");
+
+        memoText.setSelection(memoText.length());
     }
 
     @Override

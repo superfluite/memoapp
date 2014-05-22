@@ -34,7 +34,13 @@ public class SignUpActivity extends ActionBarActivity {
     private class SignUp implements View.OnClickListener{
         @Override
         public void onClick(View view) {
-            callSignUpAPI();
+            if (idText.getText().toString().matches("")) {
+                Toast.makeText(getApplicationContext(), "아이디를 입력하세요", Toast.LENGTH_LONG).show();
+            } else if (passwordText.getText().toString().matches("")) {
+                Toast.makeText(getApplicationContext(), "비밀번호를 입력하세요", Toast.LENGTH_LONG).show();
+            } else {
+                callSignUpAPI();
+            }
         }
     }
 

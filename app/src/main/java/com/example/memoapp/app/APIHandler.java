@@ -13,8 +13,8 @@ import retrofit.RestAdapter;
  * Created by Limesty on 2014-05-15.
  */
 public class APIHandler {
-    //private static final String API_URL="http://192.168.0.96:5000";
-    private static final String API_URL="http://memopage.herokuapp.com";
+    //private static final String API_URL = "http://192.168.0.96:5000";
+    private static final String API_URL = "http://memopage.herokuapp.com";
     private static RestAdapter restAdapter;
 
     private static RestAdapter getRestAdapter(){
