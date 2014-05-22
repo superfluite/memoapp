@@ -8,6 +8,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -32,19 +34,15 @@ public class MainActivity extends ActionBarActivity {
 
     private ListView memoList;
     private ListViewAdapter listViewAdapter;
+    private ListViewAdapter searchList;
     private UserData currentUser = new UserData();
     private Button newMemoButton;
     private Button loginButton;
     private Button signUpButton;
     private EditText idText;
     private EditText passwordText;
-
-    public enum Fragmentindex {;
-        private int value;
-        private Fragmentindex(int value){
-            this.value=value;
-        }
-    }
+    private EditText searchText;
+    private MemoAPI memoAPI;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,12 +57,17 @@ public class MainActivity extends ActionBarActivity {
         signUpButton.setOnClickListener(new SignUp());
         idText = (EditText)findViewById(R.id.id_text);
         passwordText = (EditText)findViewById(R.id.password_text);
+        searchText = (EditText)findViewById(R.id.search_memo);
+        searchText.addTextChangedListener(Searching);
+        searchList = new ListViewAdapter(this);
 
         memoList = (ListView)findViewById(R.id.memo_list);
         listViewAdapter = new ListViewAdapter(this);
         memoList.setAdapter(listViewAdapter);
         memoList.setOnItemLongClickListener(new MemoLongClick());
         memoList.setOnItemClickListener(new MemoClick());
+
+        memoAPI = APIHandler.getApiInterface();
 
         Bundle check =  getIntent().getExtras();
         if (check != null) {
@@ -78,7 +81,7 @@ public class MainActivity extends ActionBarActivity {
         @Override
         public void onClick(View view) {
             Intent addActivity = new Intent(MainActivity.this, AddMemoActivity.class);
-            addActivity.putExtra("currentUserId", currentUser.id);
+            addActivity.putExtra("id", currentUser.id);
             startActivity(addActivity);
         }
     }
@@ -103,6 +106,37 @@ public class MainActivity extends ActionBarActivity {
             startActivity(signUpActivity);
         }
     }
+
+    TextWatcher Searching = new TextWatcher() {
+        @Override
+        public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {
+
+        }
+
+        @Override
+        public void onTextChanged(CharSequence charSequence, int i, int i2, int i3) {
+
+        }
+
+        @Override
+        public void afterTextChanged(Editable editable) {
+            if (!(searchText.getText().toString().matches(""))) {
+                if (searchText.isFocusable()) {
+                    searchList.listData.clear();
+                    String searchWord = searchText.getText().toString();
+                    memoList.setAdapter(searchList);
+                    for (int i=0;i<listViewAdapter.getCount();i++) {
+                        if (listViewAdapter.getItem(i).memoText.contains(searchWord)) {
+                            searchList.addData(listViewAdapter.getItem(i).memoId, listViewAdapter.getItem(i).memoText, listViewAdapter.getItem(i).memoDate);
+                        }
+                    }
+                    searchList.notifyDataSetChanged();
+                }
+            } else {
+                memoList.setAdapter(listViewAdapter);
+            }
+        }
+    };
 
     @Override
     protected void onPause() {
@@ -201,8 +235,6 @@ public class MainActivity extends ActionBarActivity {
                         break;
                     case DELETE:
                         DeleteDialog(memoData.memoId, position);
-                        //listViewAdapter.deleteData(position);
-                        //listViewAdapter.notifyDataSetChanged();
                         break;
                     case CANCEL:
                         break;
@@ -337,7 +369,7 @@ public class MainActivity extends ActionBarActivity {
     }
 
     public void callMemoAPI(){
-        final MemoAPI memoAPI = APIHandler.getApiInterface();
+        //final MemoAPI memoAPI = APIHandler.getApiInterface();
         memoAPI.getMemo(currentUser.id, new Callback<List<APIHandler.MemoData>>() {
 
             @Override
@@ -358,7 +390,7 @@ public class MainActivity extends ActionBarActivity {
     }
 
     public void callMemoDeleteAPI(int id){
-        final MemoAPI memoAPI = APIHandler.getApiInterface();
+        //final MemoAPI memoAPI = APIHandler.getApiInterface();
         memoAPI.deleteMemo(id, new Callback<APIHandler.AddData>() {
             @Override
             public void success(APIHandler.AddData addData, Response response) {
@@ -373,7 +405,7 @@ public class MainActivity extends ActionBarActivity {
     }
 
     public void callLoginAPI(){
-        final MemoAPI memoAPI = APIHandler.getApiInterface();
+        //final MemoAPI memoAPI = APIHandler.getApiInterface();
         memoAPI.login(idText.getText().toString(),passwordText.getText().toString(),new Callback<APIHandler.User>() {
             @Override
             public void success(APIHandler.User user, Response response) {
@@ -395,7 +427,7 @@ public class MainActivity extends ActionBarActivity {
     }
 
     public void callDeleteAccountAPI(){
-        final MemoAPI memoAPI = APIHandler.getApiInterface();
+        //final MemoAPI memoAPI = APIHandler.getApiInterface();
         memoAPI.deleteAccount(currentUser.id, new Callback<APIHandler.User>() {
             @Override
             public void success(APIHandler.User user, Response response) {
@@ -411,43 +443,6 @@ public class MainActivity extends ActionBarActivity {
                 Toast.makeText(getApplicationContext(), "탈퇴 실패", Toast.LENGTH_LONG).show();
             }
         });
-    }
-
-    public void changeFrag(Fragmentindex index){
-        Fragment frag = null;
-        frag = getFrag(index);
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.frag_container,frag);
-        transaction.addToBackStack(null);
-        transaction.commit();
-    }
-
-    public Fragment getFrag(Fragmentindex index){
-        Fragment frag = null;
-        switch (index) {
-            default:
-                break;
-        }
-        return frag;
-    }
-
-    public static class FragController{
-        private Fragmentindex currentFragmentIndex;
-        public Fragmentindex getCurrentFragmentIndex(){
-            return this.currentFragmentIndex;
-        }
-        public void setCurrentFragmentIndex(Fragmentindex index){
-            this.currentFragmentIndex=index;
-        }
-    }
-
-    private void changeViewVisibility(int id){
-        View Target = (View)findViewById(id);
-        if (Target.getVisibility()==View.VISIBLE) {
-            Target.setVisibility(View.GONE);
-        } else {
-            Target.setVisibility(View.VISIBLE);
-        }
     }
 
     private void changeViewVisible(int id){

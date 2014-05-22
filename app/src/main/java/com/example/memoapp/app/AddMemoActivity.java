@@ -1,11 +1,13 @@
 package com.example.memoapp.app;
 
 import android.content.Intent;
+import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -20,7 +22,10 @@ public class AddMemoActivity extends ActionBarActivity {
     private Button saveButton;
     private Button resetButton;
     private Button cancelButton;
-    private int currentUserId;
+    private int id;
+    private String userId;
+    private String userPassword;
+    private InputMethodManager keyboardControl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,7 +42,14 @@ public class AddMemoActivity extends ActionBarActivity {
         cancelButton.setOnClickListener(new Cancel());
 
         Intent intent = getIntent();
-        currentUserId = (Integer)intent.getExtras().get("currentUserId");
+        id = (Integer)intent.getExtras().get("id");
+        userId = intent.getStringExtra("userId");
+        userPassword = intent.getStringExtra("userPassword");
+
+        keyboardControl = (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
+        keyboardControl.showSoftInput(memoText, InputMethodManager.SHOW_FORCED);
+
+        getActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
     private class Save implements View.OnClickListener{
@@ -74,16 +86,17 @@ public class AddMemoActivity extends ActionBarActivity {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
     public void callMemoAPI(){
         final MemoAPI memoAPI = APIHandler.getApiInterface();
-        memoAPI.updateMemo(memoText.getText().toString(), currentUserId, new Callback<APIHandler.AddData>(){
+        memoAPI.updateMemo(memoText.getText().toString(), id, new Callback<APIHandler.AddData>(){
             @Override
             public void success(APIHandler.AddData addData, Response response) {
                 Toast.makeText(getApplicationContext(), "메모가 저장되었습니다", Toast.LENGTH_LONG).show();
