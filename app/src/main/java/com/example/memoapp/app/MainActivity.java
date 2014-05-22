@@ -384,14 +384,6 @@ public class MainActivity extends ActionBarActivity {
                 mainActivity.putExtra("userPassword", user.getUserPassword());
                 finish();
                 startActivity(mainActivity);
-                /*
-                changeViewVisibility(R.id.login);
-                changeViewVisibility(R.id.memos);
-                currentUser.id = user.getId();
-                currentUser.userId = user.getUserId();
-                currentUser.userPassword = user.getUserPassword();
-                callMemoAPI();
-                */
             }
 
             @Override
@@ -408,7 +400,7 @@ public class MainActivity extends ActionBarActivity {
             @Override
             public void success(APIHandler.User user, Response response) {
                 Toast.makeText(getApplicationContext(), "탈퇴하였습니다", Toast.LENGTH_LONG).show();
-                Intent refresh = getIntent();
+                Intent refresh = new Intent(MainActivity.this, MainActivity.class);
                 finish();
                 startActivity(refresh);
             }
