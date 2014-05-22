@@ -4,8 +4,6 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.text.Editable;
@@ -15,6 +13,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.CookieSyncManager;
+import android.webkit.CookieManager;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
@@ -43,6 +43,7 @@ public class MainActivity extends ActionBarActivity {
     private EditText passwordText;
     private EditText searchText;
     private MemoAPI memoAPI;
+    private CookieManager cookieManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,6 +76,10 @@ public class MainActivity extends ActionBarActivity {
             currentUser.userId = check.getString("userId");
             currentUser.userPassword = check.getString("userPassword");
         }
+
+        CookieSyncManager.createInstance(this);
+        cookieManager = CookieManager.getInstance();
+        CookieSyncManager.getInstance().startSync();
     }
 
     private class NewMemo implements View.OnClickListener {
@@ -412,6 +417,7 @@ public class MainActivity extends ActionBarActivity {
             @Override
             public void success(APIHandler.User user, Response response) {
                 Toast.makeText(getApplicationContext(), "로그인 성공", Toast.LENGTH_LONG).show();
+
                 Intent mainActivity = new Intent(MainActivity.this, MainActivity.class);
                 mainActivity.putExtra("id", user.getId());
                 mainActivity.putExtra("userId", user.getUserId());
