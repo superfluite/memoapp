@@ -20,18 +20,23 @@
         </activity>
         <activity
             android:name="com.example.memoapp.app.AddMemoActivity"
-            android:label="@string/title_activity_add_memo" >
+            android:parentActivityName=".MainActivity"
+            android:label="@string/title_activity_add_memo"
+            android:windowSoftInputMode="adjustResize|stateVisible">
         </activity>
         <activity
             android:name="com.example.memoapp.app.ShowMemoActivity"
+            android:parentActivityName=".MainActivity"
             android:label="@string/title_activity_show_memo" >
         </activity>
         <activity
             android:name="com.example.memoapp.app.EditMemoActivity"
+            android:parentActivityName=".MainActivity"
             android:label="@string/title_activity_edit_memo" >
         </activity>
         <activity
             android:name="com.example.memoapp.app.SignUpActivity"
+            android:parentActivityName=".MainActivity"
             android:label="@string/title_activity_sign_up" >
         </activity>
     </application>

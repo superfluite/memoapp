@@ -37,12 +37,14 @@ public class EditMemoActivity extends ActionBarActivity {
         cancelButton.setOnClickListener(new Cancel());
 
         Intent intent = getIntent();
-        memoId = (Integer)intent.getExtras().get("id");
-        memoText.setText(intent.getExtras().get("text").toString());
-        memoDate = intent.getExtras().get("date").toString();
-        togoMain = (Boolean)intent.getExtras().get("togoMain");
+        memoId = intent.getExtras().getInt("id");
+        memoText.setText(intent.getStringExtra("text"));
+        memoDate = intent.getStringExtra("date");
+        togoMain = intent.getExtras().getBoolean("togoMain");
 
         memoText.setSelection(memoText.length());
+
+        getActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
     @Override
@@ -89,16 +91,17 @@ public class EditMemoActivity extends ActionBarActivity {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
     public void callMemoEditAPI(){
         final MemoAPI memoAPI = APIHandler.getApiInterface();
-        memoAPI.editMemo(memoId, memoText.getText().toString(), 1, new Callback<APIHandler.AddData>() {
+        memoAPI.editMemo(memoId, memoText.getText().toString(), new Callback<APIHandler.AddData>() {
             @Override
             public void success(APIHandler.AddData addData, Response response) {
                 Toast.makeText(getApplicationContext(), "수정되었습니다", Toast.LENGTH_LONG).show();
