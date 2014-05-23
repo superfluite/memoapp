@@ -43,4 +43,8 @@ public interface MemoAPI {
     @FormUrlEncoded
     @POST("/api/deleteaccount")
     void deleteAccount(@Field("id") int id, Callback<APIHandler.User> callback);
+
+    @FormUrlEncoded
+    @POST("/api/setimportant")
+    void setImportant(@Field("id") int id, Callback<APIHandler.AddData> callback);
 }

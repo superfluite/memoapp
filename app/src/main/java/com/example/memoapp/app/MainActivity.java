@@ -14,9 +14,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -67,6 +69,7 @@ public class MainActivity extends ActionBarActivity {
         memoList = (ListView)findViewById(R.id.memo_list);
         memoDataList = new ListViewAdapter(this);
         memoList.setAdapter(memoDataList);
+        memoList.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
         memoList.setOnItemLongClickListener(new MemoLongClick());
         memoList.setOnItemClickListener(new MemoClick());
 
@@ -312,11 +315,13 @@ public class MainActivity extends ActionBarActivity {
     public static class ViewHolder {
         public TextView memotext;
         public TextView memodate;
+        public CheckBox checkImportant;
     }
 
     public static class ListViewAdapter extends BaseAdapter {
         private Context context=null;
         private ArrayList<ListData> listData = new ArrayList<ListData>();
+        private ArrayList<CheckBox> listCheckBox = new ArrayList<CheckBox>();
 
         public ListViewAdapter(Context context){
             super();
@@ -349,6 +354,9 @@ public class MainActivity extends ActionBarActivity {
 
                 holder.memotext = (TextView)view.findViewById(R.id.text);
                 holder.memodate = (TextView)view.findViewById(R.id.date);
+                holder.checkImportant = (CheckBox)view.findViewById(R.id.check);
+                holder.checkImportant.setId(i);
+                holder.checkImportant.setOnClickListener(new Check());
 
                 view.setTag(holder);
             } else {
@@ -374,6 +382,15 @@ public class MainActivity extends ActionBarActivity {
         public void deleteData(int position){
             listData.remove(position);
         }
+
+        private class Check implements View.OnClickListener {
+            @Override
+            public void onClick(View view) {
+                ListData data = getItem(view.getId());
+                Toast.makeText(context, "check"+data.memoText, Toast.LENGTH_LONG).show();
+            }
+        }
+
     }
 
     public void callMemoAPI(){
@@ -454,6 +471,20 @@ public class MainActivity extends ActionBarActivity {
             public void failure(RetrofitError retrofitError) {
                 retrofitError.printStackTrace();
                 Toast.makeText(getApplicationContext(), "탈퇴 실패", Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    public void callSetImportantAPI(int id, int memoId){
+        memoAPI.setImportant(id, new Callback<APIHandler.AddData>() {
+            @Override
+            public void success(APIHandler.AddData addData, Response response) {
+
+            }
+
+            @Override
+            public void failure(RetrofitError retrofitError) {
+
             }
         });
     }
