@@ -18,7 +18,7 @@
         <EditText
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:hint="아이디"
+            android:hint="아이디(4자 이상)"
             android:background="@android:drawable/editbox_background"
             android:id="@+id/id_text_in_sign"
             android:layout_above="@+id/password_text_in_sign"
@@ -29,7 +29,7 @@
         <EditText
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:hint="비밀번호"
+            android:hint="비밀번호(4자 이상)"
             android:background="@android:drawable/editbox_background"
             android:inputType="textPassword"
             android:id="@+id/password_text_in_sign"

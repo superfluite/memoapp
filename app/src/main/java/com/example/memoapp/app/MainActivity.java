@@ -57,7 +57,9 @@ public class MainActivity extends ActionBarActivity {
         signUpButton = (Button)findViewById(R.id.to_sign_up_button);
         signUpButton.setOnClickListener(new SignUp());
         idText = (EditText)findViewById(R.id.id_text);
+        idText.setPrivateImeOptions("defaultInputmode=english;");
         passwordText = (EditText)findViewById(R.id.password_text);
+        passwordText.setPrivateImeOptions("defaultInputmode=english;");
         searchText = (EditText)findViewById(R.id.search_memo);
         searchText.addTextChangedListener(new Searching());
         searchList = new ListViewAdapter(this);

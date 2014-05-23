@@ -18,6 +18,7 @@ public class SignUpActivity extends ActionBarActivity {
     private EditText idText;
     private EditText passwordText;
     private Button signUpButton;
+    private final int ID_PASSWORD_MIN_LENGTH=4;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,7 +26,9 @@ public class SignUpActivity extends ActionBarActivity {
         setContentView(R.layout.activity_sign_up);
 
         idText = (EditText)findViewById(R.id.id_text_in_sign);
+        idText.setPrivateImeOptions("defaultInputmode=english;");
         passwordText = (EditText)findViewById(R.id.password_text_in_sign);
+        passwordText.setPrivateImeOptions("defaultInputmode=english;");
         signUpButton = (Button)findViewById(R.id.sign_up_button);
         signUpButton.setOnClickListener(new SignUp());
 
@@ -35,10 +38,18 @@ public class SignUpActivity extends ActionBarActivity {
     private class SignUp implements View.OnClickListener{
         @Override
         public void onClick(View view) {
-            if (idText.getText().toString().matches("")) {
-                Toast.makeText(getApplicationContext(), "아이디를 입력하세요", Toast.LENGTH_LONG).show();
-            } else if (passwordText.getText().toString().matches("")) {
-                Toast.makeText(getApplicationContext(), "비밀번호를 입력하세요", Toast.LENGTH_LONG).show();
+            if (idText.getText().toString().length()<ID_PASSWORD_MIN_LENGTH) {
+                if (idText.getText().toString().matches("")) {
+                    Toast.makeText(getApplicationContext(), "아이디를 입력하세요", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(getApplicationContext(), "아이디는 4자 이상이어야 합니다", Toast.LENGTH_LONG).show();
+                }
+            } else if (passwordText.getText().toString().length()<ID_PASSWORD_MIN_LENGTH) {
+                if (passwordText.getText().toString().matches("")) {
+                    Toast.makeText(getApplicationContext(), "비밀번호를 입력하세요", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(getApplicationContext(), "비밀번호는 4자 이상이어야 합니다", Toast.LENGTH_LONG).show();
+                }
             } else {
                 callSignUpAPI();
             }
