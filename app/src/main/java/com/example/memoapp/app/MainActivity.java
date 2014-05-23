@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.text.Editable;
@@ -45,6 +46,8 @@ public class MainActivity extends ActionBarActivity {
     private MemoAPI memoAPI;
     private CookieManager cookieManager;
 
+    public SharedPreferences sharedPreferences;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -72,16 +75,10 @@ public class MainActivity extends ActionBarActivity {
 
         memoAPI = APIHandler.getApiInterface();
 
-        Bundle check = getIntent().getExtras();
-        if (check != null) {
-            currentUser.id = check.getInt("id");
-            currentUser.userId = check.getString("userId");
-            currentUser.userPassword = check.getString("userPassword");
-        }
-
-        CookieSyncManager.createInstance(this);
-        cookieManager = CookieManager.getInstance();
-        CookieSyncManager.getInstance().startSync();
+        sharedPreferences = getSharedPreferences("pref", MODE_PRIVATE);
+        currentUser.id = sharedPreferences.getInt("id", -1);
+        currentUser.userId = sharedPreferences.getString("userId", "");
+        currentUser.userPassword = sharedPreferences.getString("userPassword", "");
     }
 
     private class NewMemo implements View.OnClickListener {
@@ -155,7 +152,7 @@ public class MainActivity extends ActionBarActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if (currentUser.userId == null) {
+        if (currentUser.userId.matches("")) {
             changeViewGone(R.id.memos);
             changeViewVisible(R.id.login);
         } else {
@@ -170,7 +167,7 @@ public class MainActivity extends ActionBarActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        if (currentUser.userId != null) {
+        if (!(currentUser.userId.matches(""))) {
             getMenuInflater().inflate(R.menu.main, menu);
         }
         return true;
@@ -289,8 +286,12 @@ public class MainActivity extends ActionBarActivity {
     private class Logout implements DialogInterface.OnClickListener{
         @Override
         public void onClick(DialogInterface dialogInterface, int i) {
-            currentUser = new UserData();
-            Intent refresh = new Intent(MainActivity.this, MainActivity.class);
+            sharedPreferences = getSharedPreferences("pref", MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.clear();
+            editor.commit();
+
+            Intent refresh = getIntent();
             finish();
             startActivity(refresh);
         }
@@ -379,7 +380,6 @@ public class MainActivity extends ActionBarActivity {
     }
 
     public void callMemoAPI(){
-        //final MemoAPI memoAPI = APIHandler.getApiInterface();
         memoAPI.getMemo(currentUser.id, new Callback<List<APIHandler.MemoData>>() {
 
             @Override
@@ -400,7 +400,6 @@ public class MainActivity extends ActionBarActivity {
     }
 
     public void callMemoDeleteAPI(int id){
-        //final MemoAPI memoAPI = APIHandler.getApiInterface();
         memoAPI.deleteMemo(id, new Callback<APIHandler.AddData>() {
             @Override
             public void success(APIHandler.AddData addData, Response response) {
@@ -415,18 +414,21 @@ public class MainActivity extends ActionBarActivity {
     }
 
     public void callLoginAPI(){
-        //final MemoAPI memoAPI = APIHandler.getApiInterface();
         memoAPI.login(idText.getText().toString(), passwordText.getText().toString(), new Callback<APIHandler.User>() {
             @Override
             public void success(APIHandler.User user, Response response) {
                 Toast.makeText(getApplicationContext(), "로그인 성공", Toast.LENGTH_LONG).show();
 
-                Intent mainActivity = new Intent(MainActivity.this, MainActivity.class);
-                mainActivity.putExtra("id", user.getId());
-                mainActivity.putExtra("userId", user.getUserId());
-                mainActivity.putExtra("userPassword", user.getUserPassword());
+                sharedPreferences = getSharedPreferences("pref", MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putInt("id", user.getId());
+                editor.putString("userId", user.getUserId());
+                editor.putString("userPassword", user.getUserPassword());
+                editor.commit();
+
+                Intent refresh = getIntent();
                 finish();
-                startActivity(mainActivity);
+                startActivity(refresh);
             }
 
             @Override
@@ -438,12 +440,15 @@ public class MainActivity extends ActionBarActivity {
     }
 
     public void callDeleteAccountAPI(){
-        //final MemoAPI memoAPI = APIHandler.getApiInterface();
         memoAPI.deleteAccount(currentUser.id, new Callback<APIHandler.User>() {
             @Override
             public void success(APIHandler.User user, Response response) {
                 Toast.makeText(getApplicationContext(), "탈퇴하였습니다", Toast.LENGTH_LONG).show();
-                Intent refresh = new Intent(MainActivity.this, MainActivity.class);
+                sharedPreferences = getSharedPreferences("pref", MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.clear();
+                editor.commit();
+                Intent refresh = getIntent();
                 finish();
                 startActivity(refresh);
             }
