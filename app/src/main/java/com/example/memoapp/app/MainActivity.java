@@ -4,8 +4,6 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.text.Editable;
@@ -371,7 +369,6 @@ public class MainActivity extends ActionBarActivity {
     }
 
     public void callMemoAPI(){
-        //final MemoAPI memoAPI = APIHandler.getApiInterface();
         memoAPI.getMemo(currentUser.id, new Callback<List<APIHandler.MemoData>>() {
 
             @Override
@@ -392,7 +389,6 @@ public class MainActivity extends ActionBarActivity {
     }
 
     public void callMemoDeleteAPI(int id){
-        //final MemoAPI memoAPI = APIHandler.getApiInterface();
         memoAPI.deleteMemo(id, new Callback<APIHandler.AddData>() {
             @Override
             public void success(APIHandler.AddData addData, Response response) {
@@ -407,7 +403,6 @@ public class MainActivity extends ActionBarActivity {
     }
 
     public void callLoginAPI(){
-        //final MemoAPI memoAPI = APIHandler.getApiInterface();
         memoAPI.login(idText.getText().toString(), passwordText.getText().toString(), new Callback<APIHandler.User>() {
             @Override
             public void success(APIHandler.User user, Response response) {
@@ -429,7 +424,6 @@ public class MainActivity extends ActionBarActivity {
     }
 
     public void callDeleteAccountAPI(){
-        //final MemoAPI memoAPI = APIHandler.getApiInterface();
         memoAPI.deleteAccount(currentUser.id, new Callback<APIHandler.User>() {
             @Override
             public void success(APIHandler.User user, Response response) {
