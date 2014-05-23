@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.text.Editable;
@@ -42,6 +43,8 @@ public class MainActivity extends ActionBarActivity {
     private EditText searchText;
     private MemoAPI memoAPI;
 
+    public SharedPreferences sharedPreferences;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -67,12 +70,19 @@ public class MainActivity extends ActionBarActivity {
 
         memoAPI = APIHandler.getApiInterface();
 
+        /*
         Bundle check = getIntent().getExtras();
         if (check != null) {
             currentUser.id = check.getInt("id");
             currentUser.userId = check.getString("userId");
             currentUser.userPassword = check.getString("userPassword");
         }
+        */
+        sharedPreferences = getSharedPreferences("pref", MODE_PRIVATE);
+        currentUser.id = sharedPreferences.getInt("id", -1);
+        currentUser.userId = sharedPreferences.getString("userId", "");
+        currentUser.userPassword = sharedPreferences.getString("userPassword", "");
+
     }
 
     private class NewMemo implements View.OnClickListener {
@@ -146,7 +156,7 @@ public class MainActivity extends ActionBarActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if (currentUser.userId == null) {
+        if (currentUser.userId.matches("")) {
             changeViewGone(R.id.memos);
             changeViewVisible(R.id.login);
         } else {
@@ -160,7 +170,7 @@ public class MainActivity extends ActionBarActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        if (currentUser.userId != null) {
+        if (!(currentUser.userId.matches(""))) {
             getMenuInflater().inflate(R.menu.main, menu);
         }
         return true;
@@ -408,11 +418,15 @@ public class MainActivity extends ActionBarActivity {
             public void success(APIHandler.User user, Response response) {
                 Toast.makeText(getApplicationContext(), "로그인 성공", Toast.LENGTH_LONG).show();
                 Intent mainActivity = new Intent(MainActivity.this, MainActivity.class);
-                mainActivity.putExtra("id", user.getId());
-                mainActivity.putExtra("userId", user.getUserId());
-                mainActivity.putExtra("userPassword", user.getUserPassword());
                 finish();
                 startActivity(mainActivity);
+
+                sharedPreferences = getSharedPreferences("pref", MODE_PRIVATE);
+                SharedPreferences.Editor sharedPreferencesEditor = sharedPreferences.edit();
+                sharedPreferencesEditor.putInt("id", user.getId());
+                sharedPreferencesEditor.putString("userId", user.getUserId());
+                sharedPreferencesEditor.putString("userPassword", user.getUserPassword());
+                sharedPreferencesEditor.commit();
             }
 
             @Override
