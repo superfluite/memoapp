@@ -55,8 +55,11 @@ public class AddMemoActivity extends ActionBarActivity {
     private class Save implements View.OnClickListener{
         @Override
         public void onClick(View view) {
-            callMemoAPI();
-            onBackPressed();
+            if (memoText.getText().toString().matches("")) {
+                Toast.makeText(getApplicationContext(), "메모를 입력하세요", Toast.LENGTH_LONG).show();
+            } else {
+                callMemoAPI();
+            }
         }
     }
 
@@ -100,6 +103,7 @@ public class AddMemoActivity extends ActionBarActivity {
             @Override
             public void success(APIHandler.AddData addData, Response response) {
                 Toast.makeText(getApplicationContext(), "메모가 저장되었습니다", Toast.LENGTH_LONG).show();
+                onBackPressed();
             }
 
             @Override

@@ -160,6 +160,7 @@ public class MainActivity extends ActionBarActivity {
             changeViewVisible(R.id.login);
         } else {
             searchText.setText("");
+            searchText.clearFocus();
             changeViewGone(R.id.login);
             changeViewVisible(R.id.memos);
             callMemoAPI();
