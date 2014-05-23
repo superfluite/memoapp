@@ -347,6 +347,7 @@ public class MainActivity extends ActionBarActivity {
                     listViewAdapter.addData(data.getId(), data.getText(), data.getWritetime());
                 }
                 listViewAdapter.notifyDataSetChanged();
+
             }
 
             @Override
