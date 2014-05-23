@@ -70,14 +70,6 @@ public class MainActivity extends ActionBarActivity {
 
         memoAPI = APIHandler.getApiInterface();
 
-        /*
-        Bundle check = getIntent().getExtras();
-        if (check != null) {
-            currentUser.id = check.getInt("id");
-            currentUser.userId = check.getString("userId");
-            currentUser.userPassword = check.getString("userPassword");
-        }
-        */
         sharedPreferences = getSharedPreferences("pref", MODE_PRIVATE);
         currentUser.id = sharedPreferences.getInt("id", -1);
         currentUser.userId = sharedPreferences.getString("userId", "");
@@ -289,8 +281,12 @@ public class MainActivity extends ActionBarActivity {
     private class Logout implements DialogInterface.OnClickListener{
         @Override
         public void onClick(DialogInterface dialogInterface, int i) {
-            currentUser = new UserData();
-            Intent refresh = new Intent(MainActivity.this, MainActivity.class);
+            sharedPreferences = getSharedPreferences("pref", MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.clear();
+            editor.commit();
+
+            Intent refresh = getIntent();
             finish();
             startActivity(refresh);
         }
@@ -417,16 +413,17 @@ public class MainActivity extends ActionBarActivity {
             @Override
             public void success(APIHandler.User user, Response response) {
                 Toast.makeText(getApplicationContext(), "로그인 성공", Toast.LENGTH_LONG).show();
-                Intent mainActivity = new Intent(MainActivity.this, MainActivity.class);
-                finish();
-                startActivity(mainActivity);
 
                 sharedPreferences = getSharedPreferences("pref", MODE_PRIVATE);
-                SharedPreferences.Editor sharedPreferencesEditor = sharedPreferences.edit();
-                sharedPreferencesEditor.putInt("id", user.getId());
-                sharedPreferencesEditor.putString("userId", user.getUserId());
-                sharedPreferencesEditor.putString("userPassword", user.getUserPassword());
-                sharedPreferencesEditor.commit();
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putInt("id", user.getId());
+                editor.putString("userId", user.getUserId());
+                editor.putString("userPassword", user.getUserPassword());
+                editor.commit();
+
+                Intent refresh = getIntent();
+                finish();
+                startActivity(refresh);
             }
 
             @Override
@@ -442,7 +439,11 @@ public class MainActivity extends ActionBarActivity {
             @Override
             public void success(APIHandler.User user, Response response) {
                 Toast.makeText(getApplicationContext(), "탈퇴하였습니다", Toast.LENGTH_LONG).show();
-                Intent refresh = new Intent(MainActivity.this, MainActivity.class);
+                sharedPreferences = getSharedPreferences("pref", MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.clear();
+                editor.commit();
+                Intent refresh = getIntent();
                 finish();
                 startActivity(refresh);
             }
